@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/stream1080/go-redis/lib/logger"
+	"github.com/stream1080/godis/lib/logger"
 )
 
 // ServerProperties defines global config properties

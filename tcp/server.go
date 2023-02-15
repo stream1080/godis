@@ -8,8 +8,8 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/stream1080/go-redis/interface/tcp"
-	"github.com/stream1080/go-redis/lib/logger"
+	"github.com/stream1080/godis/interface/tcp"
+	"github.com/stream1080/godis/lib/logger"
 )
 
 type Config struct {

@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/stream1080/go-redis/lib/logger"
-	"github.com/stream1080/go-redis/lib/sync/atomic"
-	"github.com/stream1080/go-redis/lib/sync/wait"
+	"github.com/stream1080/godis/lib/logger"
+	"github.com/stream1080/godis/lib/sync/atomic"
+	"github.com/stream1080/godis/lib/sync/wait"
 )
 
 // 客户端

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/stream1080/go-redis/config"
-	"github.com/stream1080/go-redis/lib/logger"
-	"github.com/stream1080/go-redis/tcp"
+	"github.com/stream1080/godis/config"
+	"github.com/stream1080/godis/lib/logger"
+	"github.com/stream1080/godis/tcp"
 )
 
 const configFileName string = "redis.conf"

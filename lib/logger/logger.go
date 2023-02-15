@@ -111,7 +111,8 @@ func Errorf(format string, v ...interface{}) {
 	mu.Lock()
 	defer mu.Unlock()
 	setPrefix(ERROR)
-	logger.Println(fmt.Sprintf(format, v...))
+	s := fmt.Sprintf(format, v...)
+	logger.Println(s)
 }
 
 // Fatal prints error log then stop the program

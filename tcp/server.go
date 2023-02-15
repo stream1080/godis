@@ -20,7 +20,7 @@ type Config struct {
 func ListenAndServeWithSignal(cfg *Config, handler tcp.Handler) error {
 
 	closeChan := make(chan struct{})
-	signalChan := make(chan os.Signal)
+	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
 
 	// 接收系统中的关闭信号

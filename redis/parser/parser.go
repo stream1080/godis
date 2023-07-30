@@ -5,8 +5,10 @@ import (
 	"errors"
 	"io"
 	"strconv"
+	"strings"
 
 	"github.com/stream1080/godis/interface/redis"
+	"github.com/stream1080/godis/redis/protocol"
 )
 
 // 客户端载荷
@@ -86,4 +88,24 @@ func parseMultiBulkHeader(msg []byte, state *readState) error {
 	} else {
 		return errors.New("protocol error: " + string(msg))
 	}
+}
+
+// +OK\r\n -err\r\n :5\r\n
+func parseSingleLineReply(msg []byte) (redis.Reply, error) {
+	str := strings.TrimSuffix(string(msg), "\r\n")
+	var result redis.Reply
+	switch msg[0] {
+	case '+':
+		result = protocol.MakeStatusReply(str[1:])
+	case '-':
+		result = protocol.MakeErrReply(str[1:])
+	case ':':
+		val, err := strconv.ParseInt(str[1:], 10, 64)
+		if err != nil {
+			return nil, errors.New("protocol error: " + string(msg))
+		}
+		result = protocol.MakeIntReply(val)
+	}
+
+	return result, nil
 }

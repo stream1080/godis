@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"strconv"
 
 	"github.com/stream1080/godis/interface/redis"
 )
@@ -64,4 +65,25 @@ func readLine(bufReader *bufio.Reader, state *readState) ([]byte, bool, error) {
 		state.bulkLen = 0
 	}
 	return msg, false, nil
+}
+
+func parseMultiBulkHeader(msg []byte, state *readState) error {
+
+	expectedLine, err := strconv.ParseUint(string(msg[1:len(msg)-2]), 10, 32)
+	if err != nil {
+		return errors.New("protocol error: " + string(msg))
+	}
+
+	if expectedLine == 0 {
+		state.expectedArgsCount = 0
+		return nil
+	} else if expectedLine > 0 {
+		state.msgType = msg[0]
+		state.readingMultiLine = true
+		state.expectedArgsCount = int(expectedLine)
+		state.args = make([][]byte, 0, expectedLine)
+		return nil
+	} else {
+		return errors.New("protocol error: " + string(msg))
+	}
 }

@@ -109,3 +109,26 @@ func parseSingleLineReply(msg []byte) (redis.Reply, error) {
 
 	return result, nil
 }
+
+// PING\r\n
+func readBody(msg []byte, state *readState) error {
+	line := msg[0 : len(msg)-2]
+	var err error
+
+	// $3
+	if line[0] == '$' {
+		state.bulkLen, err = strconv.ParseInt(string(line[1:]), 10, 64)
+		if err != nil {
+			return errors.New("protocol error: " + string(msg))
+		}
+		// $0\r\n
+		if state.bulkLen <= 0 {
+			state.args = append(state.args, []byte{})
+			state.bulkLen = 0
+		}
+	} else {
+		state.args = append(state.args, line)
+	}
+
+	return nil
+}

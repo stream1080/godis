@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"runtime/debug"
 	"strconv"
 	"strings"
 
 	"github.com/stream1080/godis/interface/redis"
+	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/redis/protocol"
 )
 
@@ -37,7 +39,81 @@ func parseStream(reader io.Reader) <-chan *Payload {
 }
 
 func parse0(reader io.Reader, ch chan<- *Payload) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error(string(debug.Stack()))
+		}
+	}()
+	bufReader := bufio.NewReader(reader)
+	var ioErr bool
+	var state readState
+	var err error
+	var msg []byte
 
+	for {
+		msg, ioErr, err = readLine(bufReader, &state)
+		if err != nil {
+			if ioErr {
+				ch <- &Payload{Err: err}
+				close(ch)
+				return
+			}
+			ch <- &Payload{Err: err}
+			state = readState{}
+			continue
+		}
+
+		// 多行解析
+		if !state.readingMultiLine {
+			if msg[0] == '*' {
+				if err := parseMultiBulkHeader(msg, &state); err != nil {
+					ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+					state = readState{}
+					continue
+				}
+				if state.expectedArgsCount == 0 {
+					ch <- &Payload{Data: &protocol.EmptyMultiBulkReply{}}
+					state = readState{}
+					continue
+				}
+				// $3\r\n
+			} else if msg[0] == '$' {
+				err = parseMultiBulkHeader(msg, &state)
+				if err != nil {
+					ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+					state = readState{}
+					continue
+				}
+				if state.expectedArgsCount == -1 {
+					ch <- &Payload{Data: &protocol.NullBulkReply{}}
+					state = readState{}
+					continue
+				}
+			} else {
+				result, err := parseSingleLineReply(msg)
+				ch <- &Payload{Data: result, Err: err}
+				state = readState{}
+				continue
+			}
+
+		} else {
+			if err := readBody(msg, &state); err != nil {
+				ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+				state = readState{}
+				continue
+			}
+			if state.finished() {
+				var result redis.Reply
+				if state.msgType == '*' {
+					result = protocol.MakeMultiBulkReply(state.args)
+				} else if state.msgType == '$' {
+					result = protocol.MakeBulkReply(state.args[0])
+				}
+				ch <- &Payload{Data: result, Err: err}
+				state = readState{}
+			}
+		}
+	}
 }
 
 // 读取一行

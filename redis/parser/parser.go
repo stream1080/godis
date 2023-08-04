@@ -116,7 +116,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 	}
 }
 
-// 读取一行
+// readLine 读取一行
 func readLine(bufReader *bufio.Reader, state *readState) ([]byte, bool, error) {
 	var msg []byte
 	var err error

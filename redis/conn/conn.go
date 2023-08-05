@@ -20,7 +20,22 @@ func (c *Connection) RemoteAddr() net.Addr {
 }
 
 func (c *Connection) Write(bytes []byte) error {
-	return nil
+
+	if len(bytes) == 0 {
+		return nil
+	}
+
+	c.mu.Lock()
+	c.waitingReply.Add(1)
+
+	defer func() {
+		c.waitingReply.Done()
+		c.mu.Unlock()
+	}()
+
+	_, err := c.conn.Write(bytes)
+
+	return err
 }
 
 func (c *Connection) GetDBIndex() int {

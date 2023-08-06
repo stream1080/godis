@@ -32,7 +32,7 @@ func (r *readState) finished() bool {
 	return r.expectedArgsCount > 0 && r.expectedArgsCount == len(r.args)
 }
 
-func parseStream(reader io.Reader) <-chan *Payload {
+func ParseStream(reader io.Reader) <-chan *Payload {
 	ch := make(chan *Payload)
 	go parse0(reader, ch)
 	return ch

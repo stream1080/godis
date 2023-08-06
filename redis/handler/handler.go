@@ -10,7 +10,6 @@ import (
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/lib/sync/atomic"
-	"github.com/stream1080/godis/redis/conn"
 	connection "github.com/stream1080/godis/redis/conn"
 	"github.com/stream1080/godis/redis/parser"
 	"github.com/stream1080/godis/redis/protocol"
@@ -69,7 +68,7 @@ func (r *RespHandler) Close() error {
 	r.closing.Set(true)
 	r.activeConn.Range(
 		func(key, value any) bool {
-			client := key.(*conn.Connection)
+			client := key.(*connection.Connection)
 			_ = client.Close()
 			return true
 		},

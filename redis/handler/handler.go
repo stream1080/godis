@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	database "github.com/stream1080/godis/echo_database"
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/lib/sync/atomic"
@@ -21,6 +22,12 @@ type RespHandler struct {
 	activeConn sync.Map              // 活跃连接
 	db         databaseface.Database // database
 	closing    atomic.Boolean        // 是否关闭
+}
+
+func MakeRespHandler() *RespHandler {
+	return &RespHandler{
+		db: database.NewEchoDatabase(),
+	}
 }
 
 func (r *RespHandler) closeClient(client *connection.Connection) {

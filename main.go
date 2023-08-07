@@ -6,6 +6,7 @@ import (
 
 	"github.com/stream1080/godis/config"
 	"github.com/stream1080/godis/lib/logger"
+	"github.com/stream1080/godis/redis/handler"
 	"github.com/stream1080/godis/tcp"
 )
 
@@ -41,7 +42,7 @@ func main() {
 	// 启动服务
 	err := tcp.ListenAndServeWithSignal(&tcp.Config{
 		Address: fmt.Sprintf("%s:%d", config.Properties.Bind, config.Properties.Port),
-	}, tcp.MakeEchoHandler())
+	}, handler.MakeRespHandler())
 
 	if err != nil {
 		logger.Error(err)

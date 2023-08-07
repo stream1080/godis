@@ -25,8 +25,7 @@ type RespHandler struct {
 
 func (r *RespHandler) closeClient(client *connection.Connection) {
 	_ = client.Close()
-	// TODO: r.db.AfterClientClose(client)
-	r.db.AfterClientClose(nil)
+	r.db.AfterClientClose(client)
 	r.activeConn.Delete(client)
 }
 

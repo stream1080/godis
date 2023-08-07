@@ -15,6 +15,8 @@ import (
 	"github.com/stream1080/godis/redis/protocol"
 )
 
+var unknownErrReplyBytes = []byte("-ERR unknown\r\n")
+
 type RespHandler struct {
 	activeConn sync.Map              // 活跃连接
 	db         databaseface.Database // database
@@ -23,8 +25,7 @@ type RespHandler struct {
 
 func (r *RespHandler) closeClient(client *connection.Connection) {
 	_ = client.Close()
-	// TODO: r.db.AfterClientClose(client)
-	r.db.AfterClientClose(nil)
+	r.db.AfterClientClose(client)
 	r.activeConn.Delete(client)
 }
 
@@ -58,9 +59,21 @@ func (r *RespHandler) Handle(ctx context.Context, conn net.Conn) {
 			continue
 		}
 		// exec
-
+		if payload.Data == nil {
+			continue
+		}
+		reply, ok := payload.Data.(*protocol.MultiBulkReply)
+		if !ok {
+			logger.Error("required multi bulk reply")
+			continue
+		}
+		result := r.db.Exec(client, reply.Args)
+		if result != nil {
+			_ = client.Write(result.ToBytes())
+		} else {
+			_ = client.Write(unknownErrReplyBytes)
+		}
 	}
-
 }
 
 func (r *RespHandler) Close() error {

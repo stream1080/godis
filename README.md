@@ -1,4 +1,7 @@
-[![Build Status](https://github.com/stream1080/godis/actions/workflows/go.yml/badge.svg)](https://github.com/stream1080/godis/actions?query=branch%3Amaster) ![license](https://img.shields.io/github/license/stream1080/godis)  [![Go Reference](https://pkg.go.dev/badge/github.com/stream1080/godis.svg)](https://pkg.go.dev/github.com/stream1080/godis)
+[![Build Status](https://github.com/stream1080/godis/actions/workflows/go.yml/badge.svg)](https://github.com/stream1080/godis/actions?query=branch%3Amaster) 
+[![Go Report Card](https://goreportcard.com/badge/github.com/stream1080/godis)](https://goreportcard.com/report/github.com/stream1080/godis)
+![license](https://img.shields.io/github/license/stream1080/godis)
+[![Go Reference](https://pkg.go.dev/badge/github.com/stream1080/godis.svg)](https://pkg.go.dev/github.com/stream1080/godis)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/stream1080/godis)
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/stream1080/godis)
 

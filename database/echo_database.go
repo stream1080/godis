@@ -1,4 +1,4 @@
-package echodatabase
+package database
 
 import (
 	"github.com/stream1080/godis/interface/redis"

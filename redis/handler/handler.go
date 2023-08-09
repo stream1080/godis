@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	database "github.com/stream1080/godis/echo_database"
+	"github.com/stream1080/godis/database"
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/lib/sync/atomic"

@@ -17,7 +17,7 @@ type ArgNumErrReply struct {
 	Cmd string
 }
 
-// ToBytes marshals redis.Reply
+// ToBytes marshals resp.Reply
 func (r *ArgNumErrReply) ToBytes() []byte {
 	return []byte("-ERR wrong number of arguments for '" + r.Cmd + "' command\r\n")
 }
@@ -44,7 +44,7 @@ func MakeSyntaxErrReply() *SyntaxErrReply {
 	return theSyntaxErrReply
 }
 
-// ToBytes marshals redis.Reply
+// ToBytes marshals resp.Reply
 func (r *SyntaxErrReply) ToBytes() []byte {
 	return syntaxErrBytes
 }

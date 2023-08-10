@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/stream1080/godis/interface/redis"
+	"github.com/stream1080/godis/interface/resp"
 	"github.com/stream1080/godis/redis/protocol"
 )
 

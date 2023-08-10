@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"strconv"
 
-	"github.com/stream1080/godis/interface/redis"
+	"github.com/stream1080/godis/interface/resp"
 )
 
 var (
 
-	// CRLF is the line separator of redis serialization protocol
+	// CRLF is the line separator of resp serialization protocol
 	CRLF = "\r\n"
 )
 
@@ -27,7 +27,7 @@ func MakeBulkReply(arg []byte) *BulkReply {
 	}
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *BulkReply) ToBytes() []byte {
 	if r.Arg == nil {
 		return nullBulkBytes
@@ -49,7 +49,7 @@ func MakeMultiBulkReply(args [][]byte) *MultiBulkReply {
 	}
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *MultiBulkReply) ToBytes() []byte {
 	argLen := len(r.Args)
 	var buf bytes.Buffer
@@ -78,7 +78,7 @@ func MakeMultiRawReply(replies []redis.Reply) *MultiRawReply {
 	}
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *MultiRawReply) ToBytes() []byte {
 	argLen := len(r.Replies)
 	var buf bytes.Buffer
@@ -103,7 +103,7 @@ func MakeStatusReply(status string) *StatusReply {
 	}
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *StatusReply) ToBytes() []byte {
 	return []byte("+" + r.Status + CRLF)
 }
@@ -127,14 +127,14 @@ func MakeIntReply(code int64) *IntReply {
 	}
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *IntReply) ToBytes() []byte {
 	return []byte(":" + strconv.FormatInt(r.Code, 10) + CRLF)
 }
 
 /* ---- Error Reply ---- */
 
-// ErrorReply is an error and redis.Reply
+// ErrorReply is an error and resp.Reply
 type ErrorReply interface {
 	Error() string
 	ToBytes() []byte
@@ -157,7 +157,7 @@ func IsErrorReply(reply redis.Reply) bool {
 	return reply.ToBytes()[0] == '-'
 }
 
-// ToBytes marshal redis.Reply
+// ToBytes marshal resp.Reply
 func (r *StandardErrReply) ToBytes() []byte {
 	return []byte("-" + r.Status + CRLF)
 }

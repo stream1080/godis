@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/stream1080/godis/interface/redis"
+	"github.com/stream1080/godis/interface/resp"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/redis/protocol"
 )

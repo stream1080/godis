@@ -10,7 +10,7 @@ import (
 	"github.com/stream1080/godis/tcp"
 )
 
-const configFileName string = "redis.conf"
+const configFileName string = "resp.conf"
 
 // 默认配置
 var defaultProperties = &config.ServerProperties{

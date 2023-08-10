@@ -9,7 +9,7 @@ import (
 
 var (
 
-	// CRLF is the line separator of resp serialization protocol
+	// CRLF is the line separator of resp serialization reply
 	CRLF = "\r\n"
 )
 
@@ -108,7 +108,7 @@ func (r *StatusReply) ToBytes() []byte {
 	return []byte("+" + r.Status + CRLF)
 }
 
-// IsOKReply returns true if the given protocol is +OK
+// IsOKReply returns true if the given reply is +OK
 func IsOKReply(reply redis.Reply) bool {
 	return string(reply.ToBytes()) == "+OK\r\n"
 }
@@ -120,7 +120,7 @@ type IntReply struct {
 	Code int64
 }
 
-// MakeIntReply creates int protocol
+// MakeIntReply creates int reply
 func MakeIntReply(code int64) *IntReply {
 	return &IntReply{
 		Code: code,
@@ -152,7 +152,7 @@ func MakeErrReply(status string) *StandardErrReply {
 	}
 }
 
-// IsErrorReply returns true if the given protocol is error
+// IsErrorReply returns true if the given reply is error
 func IsErrorReply(reply redis.Reply) bool {
 	return reply.ToBytes()[0] == '-'
 }

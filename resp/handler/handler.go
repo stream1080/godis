@@ -11,9 +11,9 @@ import (
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/lib/sync/atomic"
-	connection "github.com/stream1080/godis/redis/conn"
-	"github.com/stream1080/godis/redis/parser"
-	"github.com/stream1080/godis/redis/protocol"
+	connection "github.com/stream1080/godis/resp/conn"
+	"github.com/stream1080/godis/resp/parser"
+	"github.com/stream1080/godis/resp/reply"
 )
 
 var unknownErrReplyBytes = []byte("-ERR unknown\r\n")
@@ -55,7 +55,7 @@ func (r *RespHandler) Handle(ctx context.Context, conn net.Conn) {
 				logger.Info("connection closed: " + client.RemoteAddr().String())
 				return
 			}
-			// protocol error
+			// reply error
 			errReply := protocol.MakeErrReply(payload.Err.Error())
 			err := client.Write(errReply.ToBytes())
 			if err != nil {

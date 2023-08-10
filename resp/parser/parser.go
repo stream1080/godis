@@ -10,7 +10,7 @@ import (
 
 	"github.com/stream1080/godis/interface/resp"
 	"github.com/stream1080/godis/lib/logger"
-	"github.com/stream1080/godis/redis/protocol"
+	"github.com/stream1080/godis/resp/reply"
 )
 
 // 客户端载荷
@@ -67,7 +67,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 		if !state.readingMultiLine {
 			if msg[0] == '*' {
 				if err := parseMultiBulkHeader(msg, &state); err != nil {
-					ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+					ch <- &Payload{Err: errors.New("reply error: " + string(msg))}
 					state = readState{}
 					continue
 				}
@@ -80,7 +80,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 			} else if msg[0] == '$' {
 				err = parseMultiBulkHeader(msg, &state)
 				if err != nil {
-					ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+					ch <- &Payload{Err: errors.New("reply error: " + string(msg))}
 					state = readState{}
 					continue
 				}
@@ -98,7 +98,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 
 		} else {
 			if err := readBody(msg, &state); err != nil {
-				ch <- &Payload{Err: errors.New("protocol error: " + string(msg))}
+				ch <- &Payload{Err: errors.New("reply error: " + string(msg))}
 				state = readState{}
 				continue
 			}
@@ -128,7 +128,7 @@ func readLine(bufReader *bufio.Reader, state *readState) ([]byte, bool, error) {
 			return nil, true, err
 		}
 		if len(msg) == 0 || msg[len(msg)-2] != '\n' {
-			return nil, false, errors.New("protocol error: " + string(msg))
+			return nil, false, errors.New("reply error: " + string(msg))
 		}
 	} else {
 		// 读到 $ 数字
@@ -138,7 +138,7 @@ func readLine(bufReader *bufio.Reader, state *readState) ([]byte, bool, error) {
 			return nil, true, err
 		}
 		if len(msg) == 0 || msg[len(msg)-2] != '\r' || msg[len(msg)-1] != '\n' {
-			return nil, false, errors.New("protocol error: " + string(msg))
+			return nil, false, errors.New("reply error: " + string(msg))
 		}
 		state.bulkLen = 0
 	}
@@ -149,7 +149,7 @@ func parseMultiBulkHeader(msg []byte, state *readState) error {
 
 	expectedLine, err := strconv.ParseUint(string(msg[1:len(msg)-2]), 10, 32)
 	if err != nil {
-		return errors.New("protocol error: " + string(msg))
+		return errors.New("reply error: " + string(msg))
 	}
 
 	if expectedLine == 0 {
@@ -162,7 +162,7 @@ func parseMultiBulkHeader(msg []byte, state *readState) error {
 		state.args = make([][]byte, 0, expectedLine)
 		return nil
 	} else {
-		return errors.New("protocol error: " + string(msg))
+		return errors.New("reply error: " + string(msg))
 	}
 }
 
@@ -178,7 +178,7 @@ func parseSingleLineReply(msg []byte) (redis.Reply, error) {
 	case ':':
 		val, err := strconv.ParseInt(str[1:], 10, 64)
 		if err != nil {
-			return nil, errors.New("protocol error: " + string(msg))
+			return nil, errors.New("reply error: " + string(msg))
 		}
 		result = protocol.MakeIntReply(val)
 	}
@@ -195,7 +195,7 @@ func readBody(msg []byte, state *readState) error {
 	if line[0] == '$' {
 		state.bulkLen, err = strconv.ParseInt(string(line[1:]), 10, 64)
 		if err != nil {
-			return errors.New("protocol error: " + string(msg))
+			return errors.New("reply error: " + string(msg))
 		}
 		// $0\r\n
 		if state.bulkLen <= 0 {

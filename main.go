@@ -6,7 +6,7 @@ import (
 
 	"github.com/stream1080/godis/config"
 	"github.com/stream1080/godis/lib/logger"
-	"github.com/stream1080/godis/redis/handler"
+	"github.com/stream1080/godis/resp/handler"
 	"github.com/stream1080/godis/tcp"
 )
 

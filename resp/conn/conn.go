@@ -12,7 +12,7 @@ type Connection struct {
 	conn         net.Conn
 	waitingReply wait.Wait
 	mu           sync.Mutex
-	selecteDB    int
+	selectDB     int
 }
 
 func NewConn(conn net.Conn) *Connection {
@@ -45,11 +45,11 @@ func (c *Connection) Write(bytes []byte) error {
 }
 
 func (c *Connection) GetDBIndex() int {
-	return c.selecteDB
+	return c.selectDB
 }
 
 func (c *Connection) SelectDB(dbNum int) {
-	c.selecteDB = dbNum
+	c.selectDB = dbNum
 }
 
 func (c *Connection) Close() error {

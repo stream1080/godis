@@ -52,6 +52,7 @@ func (db *DB) GetEntity(key string) (*database.DataEntity, bool) {
 	if !ok {
 		return nil, false
 	}
+
 	return raw.(*database.DataEntity), true
 }
 

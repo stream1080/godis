@@ -72,7 +72,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 					continue
 				}
 				if state.expectedArgsCount == 0 {
-					ch <- &Payload{Data: &protocol.EmptyMultiBulkReply{}}
+					ch <- &Payload{Data: &reply.EmptyMultiBulkReply{}}
 					state = readState{}
 					continue
 				}
@@ -85,7 +85,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 					continue
 				}
 				if state.expectedArgsCount == -1 {
-					ch <- &Payload{Data: &protocol.NullBulkReply{}}
+					ch <- &Payload{Data: &reply.NullBulkReply{}}
 					state = readState{}
 					continue
 				}
@@ -105,9 +105,9 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 			if state.finished() {
 				var result redis.Reply
 				if state.msgType == '*' {
-					result = protocol.MakeMultiBulkReply(state.args)
+					result = reply.MakeMultiBulkReply(state.args)
 				} else if state.msgType == '$' {
-					result = protocol.MakeBulkReply(state.args[0])
+					result = reply.MakeBulkReply(state.args[0])
 				}
 				ch <- &Payload{Data: result, Err: err}
 				state = readState{}
@@ -172,15 +172,15 @@ func parseSingleLineReply(msg []byte) (redis.Reply, error) {
 	var result redis.Reply
 	switch msg[0] {
 	case '+':
-		result = protocol.MakeStatusReply(str[1:])
+		result = reply.MakeStatusReply(str[1:])
 	case '-':
-		result = protocol.MakeErrReply(str[1:])
+		result = reply.MakeErrReply(str[1:])
 	case ':':
 		val, err := strconv.ParseInt(str[1:], 10, 64)
 		if err != nil {
 			return nil, errors.New("reply error: " + string(msg))
 		}
-		result = protocol.MakeIntReply(val)
+		result = reply.MakeIntReply(val)
 	}
 
 	return result, nil

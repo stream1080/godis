@@ -13,7 +13,7 @@ func NewEchoDatabase() *EchoDatabase {
 }
 
 func (e *EchoDatabase) Exec(client redis.Connection, args [][]byte) redis.Reply {
-	return protocol.MakeMultiBulkReply(args)
+	return reply.MakeMultiBulkReply(args)
 }
 
 func (e *EchoDatabase) Close() {

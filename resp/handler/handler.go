@@ -56,7 +56,7 @@ func (r *RespHandler) Handle(ctx context.Context, conn net.Conn) {
 				return
 			}
 			// reply error
-			errReply := protocol.MakeErrReply(payload.Err.Error())
+			errReply := reply.MakeErrReply(payload.Err.Error())
 			err := client.Write(errReply.ToBytes())
 			if err != nil {
 				r.closeClient(client)
@@ -69,7 +69,7 @@ func (r *RespHandler) Handle(ctx context.Context, conn net.Conn) {
 		if payload.Data == nil {
 			continue
 		}
-		reply, ok := payload.Data.(*protocol.MultiBulkReply)
+		reply, ok := payload.Data.(*reply.MultiBulkReply)
 		if !ok {
 			logger.Error("required multi bulk reply")
 			continue

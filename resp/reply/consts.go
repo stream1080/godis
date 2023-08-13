@@ -1,4 +1,4 @@
-package protocol
+package reply
 
 type PongReply struct{}
 

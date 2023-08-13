@@ -1,4 +1,4 @@
-package redis
+package resp
 
 type Connection interface {
 	Write([]byte) error // 写入数据

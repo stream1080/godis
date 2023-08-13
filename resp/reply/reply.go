@@ -68,11 +68,11 @@ func (r *MultiBulkReply) ToBytes() []byte {
 
 // MultiRawReply store complex list structure, for example GeoPos command
 type MultiRawReply struct {
-	Replies []redis.Reply
+	Replies []resp.Reply
 }
 
 // MakeMultiRawReply creates MultiRawReply
-func MakeMultiRawReply(replies []redis.Reply) *MultiRawReply {
+func MakeMultiRawReply(replies []resp.Reply) *MultiRawReply {
 	return &MultiRawReply{
 		Replies: replies,
 	}
@@ -109,7 +109,7 @@ func (r *StatusReply) ToBytes() []byte {
 }
 
 // IsOKReply returns true if the given reply is +OK
-func IsOKReply(reply redis.Reply) bool {
+func IsOKReply(reply resp.Reply) bool {
 	return string(reply.ToBytes()) == "+OK\r\n"
 }
 
@@ -153,7 +153,7 @@ func MakeErrReply(status string) *StandardErrReply {
 }
 
 // IsErrorReply returns true if the given reply is error
-func IsErrorReply(reply redis.Reply) bool {
+func IsErrorReply(reply resp.Reply) bool {
 	return reply.ToBytes()[0] == '-'
 }
 

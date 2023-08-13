@@ -15,7 +15,7 @@ import (
 
 // 客户端载荷
 type Payload struct {
-	Data redis.Reply
+	Data resp.Reply
 	Err  error
 }
 
@@ -103,7 +103,7 @@ func parse0(reader io.Reader, ch chan<- *Payload) {
 				continue
 			}
 			if state.finished() {
-				var result redis.Reply
+				var result resp.Reply
 				if state.msgType == '*' {
 					result = reply.MakeMultiBulkReply(state.args)
 				} else if state.msgType == '$' {
@@ -167,9 +167,9 @@ func parseMultiBulkHeader(msg []byte, state *readState) error {
 }
 
 // +OK\r\n -err\r\n :5\r\n
-func parseSingleLineReply(msg []byte) (redis.Reply, error) {
+func parseSingleLineReply(msg []byte) (resp.Reply, error) {
 	str := strings.TrimSuffix(string(msg), "\r\n")
-	var result redis.Reply
+	var result resp.Reply
 	switch msg[0] {
 	case '+':
 		result = reply.MakeStatusReply(str[1:])

@@ -7,9 +7,9 @@ import (
 type CmdLine = [][]byte
 
 type Database interface {
-	Exec(client redis.Connection, args [][]byte) redis.Reply
+	Exec(client resp.Connection, args [][]byte) resp.Reply
 	Close()
-	AfterClientClose(c redis.Connection)
+	AfterClientClose(c resp.Connection)
 }
 
 type DataEntity struct {

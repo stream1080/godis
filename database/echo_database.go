@@ -12,14 +12,14 @@ func NewEchoDatabase() *EchoDatabase {
 	return &EchoDatabase{}
 }
 
-func (e *EchoDatabase) Exec(client redis.Connection, args [][]byte) redis.Reply {
-	return protocol.MakeMultiBulkReply(args)
+func (e *EchoDatabase) Exec(client resp.Connection, args [][]byte) resp.Reply {
+	return reply.MakeMultiBulkReply(args)
 }
 
 func (e *EchoDatabase) Close() {
 
 }
 
-func (e *EchoDatabase) AfterClientClose(c redis.Connection) {
+func (e *EchoDatabase) AfterClientClose(c resp.Connection) {
 
 }

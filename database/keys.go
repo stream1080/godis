@@ -2,16 +2,18 @@ package database
 
 import (
 	"github.com/stream1080/godis/interface/resp"
+	"github.com/stream1080/godis/lib/wildcard"
 	"github.com/stream1080/godis/resp/reply"
 )
 
 func init() {
-	RegisterCommand("DEL", ExecDel, -2)
-	RegisterCommand("EXISTS", ExecExists, -2)
-	RegisterCommand("flushdb", ExecFlushDB, -1)
-	RegisterCommand("type", ExecType, 2)
-	RegisterCommand("RENAME", ExecRename, 3)
-	RegisterCommand("RENAMENX", ExecRenameNx, 3)
+	RegisterCommand("DEL", ExecDel, -2)          // DEL k1,k2,k3
+	RegisterCommand("EXISTS", ExecExists, -2)    // EXISTS k1,k2,k3
+	RegisterCommand("flushdb", ExecFlushDB, -1)  // FLUSHDB a,b,a
+	RegisterCommand("type", ExecType, 2)         // TYPE k1
+	RegisterCommand("RENAME", ExecRename, 3)     // RENAME k1,k2
+	RegisterCommand("RENAMENX", ExecRenameNx, 3) // RENAMENX k1,k2
+	RegisterCommand("KEYS", ExecKeys, 2)         // KEYS *
 }
 
 func ExecDel(db *DB, args [][]byte) resp.Reply {
@@ -88,4 +90,17 @@ func ExecRenameNx(db *DB, args [][]byte) resp.Reply {
 	db.Remove(src)
 
 	return reply.MakeIntReply(1)
+}
+
+func ExecKeys(db *DB, args [][]byte) resp.Reply {
+	pattern := wildcard.CompilePattern(string(args[0]))
+	result := make([][]byte, 0)
+	db.data.ForEach(func(key string, val interface{}) bool {
+		if pattern.IsMatch(key) {
+			result = append(result, []byte(key))
+		}
+		return true
+	})
+
+	return reply.MakeMultiBulkReply(result)
 }

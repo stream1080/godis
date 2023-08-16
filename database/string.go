@@ -26,3 +26,12 @@ func ExecSet(db *DB, args [][]byte) resp.Reply {
 
 	return reply.MakeOkReply()
 }
+
+func ExecSetNX(db *DB, args [][]byte) resp.Reply {
+	key := string(args[0])
+	entity := &database.DataEntity{
+		Data: args[1],
+	}
+
+	return reply.MakeIntReply(int64(db.PutIfAbsen(key, entity)))
+}

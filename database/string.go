@@ -6,6 +6,14 @@ import (
 	"github.com/stream1080/godis/resp/reply"
 )
 
+func init() {
+	RegisterCommand("Get", ExecGet, 2)       // get k1
+	RegisterCommand("Set", ExecSet, 3)       // set k v
+	RegisterCommand("SetNX", ExecSetNX, 3)   // setnx k v
+	RegisterCommand("GetSet", ExecGetSet, 3) // getset k v
+	RegisterCommand("StrLen", ExecStrLen, 2) // strlen k
+}
+
 func ExecGet(db *DB, args [][]byte) resp.Reply {
 	key := string(args[0])
 	entity, exists := db.GetEntity(key)

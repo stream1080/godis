@@ -1,6 +1,8 @@
 package database
 
 import (
+	"strconv"
+
 	"github.com/stream1080/godis/config"
 	"github.com/stream1080/godis/interface/resp"
 	"github.com/stream1080/godis/resp/reply"
@@ -36,4 +38,20 @@ func (db *Database) Close() {
 
 func (db *Database) AfterClientClose(c resp.Connection) {
 
+}
+
+func execSelect(c resp.Connection, database Database, args [][]byte) resp.Reply {
+
+	index, err := strconv.Atoi(string(args[0]))
+	if err != nil {
+		return reply.MakeErrReply("ERR invalid DB index")
+	}
+
+	if index > len(database.dbSet) {
+		return reply.MakeErrReply("ERR DB index is out of range")
+	}
+
+	c.SelectDB(index)
+
+	return reply.MakeOkReply()
 }

@@ -30,7 +30,7 @@ func NewDatabase() *Database {
 	return database
 }
 
-func (db *Database) Exec(client resp.Connection, args [][]byte) resp.Reply {
+func (database *Database) Exec(client resp.Connection, args [][]byte) resp.Reply {
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Error(err)
@@ -42,14 +42,14 @@ func (db *Database) Exec(client resp.Connection, args [][]byte) resp.Reply {
 		if len(args) != 2 {
 			return reply.MakeArgNumErrReply("select")
 		}
-		return execSelect(client, db, args[1:])
+		return execSelect(client, database, args[1:])
 	}
 
-	dbs := db.dbSet[client.GetDBIndex()]
-	return dbs.Exec(client, args)
+	db := database.dbSet[client.GetDBIndex()]
+	return db.Exec(client, args)
 }
 
-func (db *Database) Close() {
+func (database *Database) Close() {
 
 }
 

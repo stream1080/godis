@@ -2,9 +2,11 @@ package database
 
 import (
 	"strconv"
+	"strings"
 
 	"github.com/stream1080/godis/config"
 	"github.com/stream1080/godis/interface/resp"
+	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/resp/reply"
 )
 
@@ -29,7 +31,22 @@ func NewDatabase() *Database {
 }
 
 func (db *Database) Exec(client resp.Connection, args [][]byte) resp.Reply {
-	return reply.MakeMultiBulkReply(args)
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error(err)
+		}
+	}()
+
+	cmd := strings.ToLower(string(args[0]))
+	if cmd == "select" {
+		if len(args) != 2 {
+			return reply.MakeArgNumErrReply("select")
+		}
+		return execSelect(client, db, args[1:])
+	}
+
+	dbs := db.dbSet[client.GetDBIndex()]
+	return dbs.Exec(client, args)
 }
 
 func (db *Database) Close() {
@@ -40,7 +57,7 @@ func (db *Database) AfterClientClose(c resp.Connection) {
 
 }
 
-func execSelect(c resp.Connection, database Database, args [][]byte) resp.Reply {
+func execSelect(c resp.Connection, database *Database, args [][]byte) resp.Reply {
 
 	index, err := strconv.Atoi(string(args[0]))
 	if err != nil {

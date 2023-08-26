@@ -4,6 +4,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/stream1080/godis/config"
 	databaseface "github.com/stream1080/godis/interface/database"
 )
 
@@ -30,4 +31,18 @@ type AofHandler struct {
 	// pause aof for start/finish aof rewrite progress
 	pausingAof sync.RWMutex
 	currentDB  int
+}
+
+func NewAofHandler(database databaseface.Database) (*AofHandler, error) {
+	handler := &AofHandler{}
+	handler.aofFilename = config.Properties.AppendFilename
+	handler.db = database
+	// TODO load aof
+	f, err := os.OpenFile(handler.aofFilename, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return nil, err
+	}
+	handler.aofFile = f
+	// TODO channel
+	return handler, nil
 }

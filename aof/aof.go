@@ -37,12 +37,35 @@ func NewAofHandler(database databaseface.Database) (*AofHandler, error) {
 	handler := &AofHandler{}
 	handler.aofFilename = config.Properties.AppendFilename
 	handler.db = database
-	// TODO load aof
+	handler.loadAof()
+
 	f, err := os.OpenFile(handler.aofFilename, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		return nil, err
 	}
 	handler.aofFile = f
-	// TODO channel
+	handler.aofChan = make(chan *payload, aofQueueSize)
+	go handler.handleAof()
+
 	return handler, nil
+}
+
+// Add payload (set k,v) -> aofChan
+func (handler *AofHandler) AddAof(dbIndex int, cmd CmdLine) {
+	if config.Properties.AppendOnly && handler.aofChan != nil {
+		handler.aofChan <- &payload{
+			cmdLine: cmd,
+			dbIndex: dbIndex,
+		}
+	}
+}
+
+// handleAof payload(set k,v) <- aofChan
+func (handler *AofHandler) handleAof() {
+	//TODO
+}
+
+// loadAof
+func (handler *AofHandler) loadAof() {
+
 }

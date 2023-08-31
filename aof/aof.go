@@ -2,10 +2,14 @@ package aof
 
 import (
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/stream1080/godis/config"
 	databaseface "github.com/stream1080/godis/interface/database"
+	"github.com/stream1080/godis/lib/logger"
+	"github.com/stream1080/godis/lib/utils"
+	"github.com/stream1080/godis/resp/reply"
 )
 
 // CmdLine is alias for [][]byte, represents a command line
@@ -62,7 +66,25 @@ func (handler *AofHandler) AddAof(dbIndex int, cmd CmdLine) {
 
 // handleAof payload(set k,v) <- aofChan
 func (handler *AofHandler) handleAof() {
-	//TODO
+	handler.currentDB = 0
+	for p := range handler.aofChan {
+		if p.dbIndex != handler.currentDB {
+			b := utils.ToCmdLine("select", strconv.Itoa(p.dbIndex))
+			data := reply.MakeMultiBulkReply(b).ToBytes()
+			_, err := handler.aofFile.Write(data)
+			if err != nil {
+				logger.Warn(err)
+				continue
+			}
+			handler.currentDB = p.dbIndex
+		}
+
+		data := reply.MakeMultiBulkReply(p.cmdLine).ToBytes()
+		_, err := handler.aofFile.Write(data)
+		if err != nil {
+			logger.Warn(err)
+		}
+	}
 }
 
 // loadAof

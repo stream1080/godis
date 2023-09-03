@@ -10,8 +10,9 @@ import (
 )
 
 type DB struct {
-	index int
-	data  dict.Dict
+	index  int
+	data   dict.Dict
+	addAof func(CmdLine)
 }
 
 type (
@@ -21,7 +22,8 @@ type (
 
 func MakeDB() *DB {
 	return &DB{
-		data: dict.MakeSyncDict(),
+		data:   dict.MakeSyncDict(),
+		addAof: func(line CmdLine) {},
 	}
 }
 func (db *DB) Exec(c resp.Connection, cmdLine CmdLine) resp.Reply {

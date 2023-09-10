@@ -2,6 +2,7 @@ package database
 
 import (
 	"github.com/stream1080/godis/interface/resp"
+	"github.com/stream1080/godis/lib/utils"
 	"github.com/stream1080/godis/lib/wildcard"
 	"github.com/stream1080/godis/resp/reply"
 )
@@ -21,8 +22,12 @@ func ExecDel(db *DB, args [][]byte) resp.Reply {
 	for i, v := range args {
 		keys[i] = string(v)
 	}
+	deleted := db.Removes(keys...)
+	if deleted > 0 {
+		db.addAof(utils.ToCmdLine2("del", args...))
+	}
 
-	return reply.MakeIntReply(int64(db.Removes(keys...)))
+	return reply.MakeIntReply(int64(deleted))
 }
 
 func ExecExists(db *DB, args [][]byte) resp.Reply {
@@ -40,6 +45,7 @@ func ExecExists(db *DB, args [][]byte) resp.Reply {
 
 func ExecFlushDB(db *DB, args [][]byte) resp.Reply {
 	db.Flush()
+	db.addAof(utils.ToCmdLine2("flushdb", args...))
 	return reply.MakeOkReply()
 }
 
@@ -69,6 +75,7 @@ func ExecRename(db *DB, args [][]byte) resp.Reply {
 
 	db.PutEntity(dest, entity)
 	db.Remove(src)
+	db.addAof(utils.ToCmdLine2("rename", args...))
 
 	return reply.MakeOkReply()
 }
@@ -88,6 +95,7 @@ func ExecRenameNx(db *DB, args [][]byte) resp.Reply {
 
 	db.PutEntity(dest, entity)
 	db.Remove(src)
+	db.addAof(utils.ToCmdLine2("renamenx", args...))
 
 	return reply.MakeIntReply(1)
 }

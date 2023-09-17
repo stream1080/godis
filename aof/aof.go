@@ -10,6 +10,7 @@ import (
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
 	"github.com/stream1080/godis/lib/utils"
+	"github.com/stream1080/godis/resp/conn"
 	"github.com/stream1080/godis/resp/parser"
 	"github.com/stream1080/godis/resp/reply"
 )
@@ -99,6 +100,7 @@ func (handler *AofHandler) loadAof() {
 	defer f.Close()
 
 	ch := parser.ParseStream(f)
+	faceConn := &conn.Connection{}
 	for p := range ch {
 		if p.Err != nil {
 			if p.Err == io.EOF {
@@ -111,12 +113,15 @@ func (handler *AofHandler) loadAof() {
 			logger.Error("empty payload")
 			continue
 		}
-		_, ok := p.Data.(*reply.MultiBulkReply)
+		r, ok := p.Data.(*reply.MultiBulkReply)
 		if !ok {
 			logger.Error("need multi bulk")
 			continue
 		}
 
+		rep := handler.db.Exec(faceConn, r.Args)
+		if reply.IsErrorReply(rep) {
+			logger.Error(rep)
+		}
 	}
-
 }

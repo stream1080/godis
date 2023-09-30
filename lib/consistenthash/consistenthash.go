@@ -1,6 +1,9 @@
 package consistenthash
 
-import "hash/crc32"
+import (
+	"hash/crc32"
+	"sort"
+)
 
 type HashFunc func(data []byte) uint32
 
@@ -23,4 +26,17 @@ func NewNodeMap(hashFunc HashFunc) *NodeMap {
 
 func (n *NodeMap) IsEmpty() bool {
 	return len(n.nodeHashs) == 0
+}
+
+func (n *NodeMap) AddNode(keys ...string) {
+	for _, key := range keys {
+		if key == "" {
+			continue
+		}
+		hash := int(n.hashFunc([]byte(key)))
+		n.nodeHashs = append(n.nodeHashs, hash)
+		n.nodeHashMap[hash] = key
+	}
+
+	sort.Ints(n.nodeHashs)
 }

@@ -40,3 +40,16 @@ func (n *NodeMap) AddNode(keys ...string) {
 
 	sort.Ints(n.nodeHashs)
 }
+
+func (n *NodeMap) PickNode(key string) string {
+	if n.IsEmpty() {
+		return ""
+	}
+
+	hash := int(n.hashFunc([]byte(key)))
+	index := sort.Search(len(n.nodeHashs), func(i int) bool {
+		return n.nodeHashs[i] >= hash
+	})
+
+	return n.nodeHashMap[n.nodeHashs[index%len(n.nodeHashs)]]
+}

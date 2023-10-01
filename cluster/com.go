@@ -3,7 +3,11 @@ package cluster
 import (
 	"context"
 	"errors"
+	"github.com/stream1080/godis/interface/resp"
+	"github.com/stream1080/godis/lib/utils"
 	"github.com/stream1080/godis/resp/client"
+	"github.com/stream1080/godis/resp/reply"
+	"strconv"
 )
 
 func (cluster *ClusterDatabases) getPeerClient(peer string) (*client.Client, error) {
@@ -32,4 +36,31 @@ func (cluster *ClusterDatabases) returnPeerClient(peer string, client *client.Cl
 	}
 
 	return pool.ReturnObject(context.Background(), client)
+}
+
+func (cluster *ClusterDatabases) relay(peer string, c resp.Connection, args [][]byte) resp.Reply {
+	if peer == cluster.self {
+		return cluster.db.Exec(c, args)
+	}
+
+	peerClient, err := cluster.getPeerClient(peer)
+	if err != nil {
+		return reply.MakeErrReply(err.Error())
+	}
+
+	defer func() {
+		_ = cluster.returnPeerClient(peer, peerClient)
+	}()
+	peerClient.Send(utils.ToCmdLine("SELECT", strconv.Itoa(c.GetDBIndex())))
+
+	return peerClient.Send(args)
+}
+
+func (cluster *ClusterDatabases) broadcast(c resp.Connection, args [][]byte) map[string]resp.Reply {
+	results := make(map[string]resp.Reply)
+	for _, node := range cluster.nodes {
+		results[node] = cluster.relay(node, c, args)
+	}
+
+	return results
 }

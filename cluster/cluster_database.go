@@ -42,14 +42,14 @@ func MakeClusterDatabases() *ClusterDatabases {
 	return cluster
 }
 
-func (c *ClusterDatabases) Exec(client resp.Connection, args [][]byte) resp.Reply {
+func (cluster *ClusterDatabases) Exec(client resp.Connection, args [][]byte) resp.Reply {
 	panic("implement me")
 }
 
-func (c *ClusterDatabases) Close() {
+func (cluster *ClusterDatabases) Close() {
 	panic("implement me")
 }
 
-func (c *ClusterDatabases) AfterClientClose(conn resp.Connection) {
+func (cluster *ClusterDatabases) AfterClientClose(conn resp.Connection) {
 	panic("implement me")
 }

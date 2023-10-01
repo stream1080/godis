@@ -24,3 +24,12 @@ func (cluster *ClusterDatabases) getPeerClient(peer string) (*client.Client, err
 
 	return c, nil
 }
+
+func (cluster *ClusterDatabases) returnPeerClient(peer string, client *client.Client) error {
+	pool, ok := cluster.peerConn[peer]
+	if !ok {
+		return errors.New("conn not found")
+	}
+
+	return pool.ReturnObject(context.Background(), client)
+}

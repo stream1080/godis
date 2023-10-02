@@ -18,6 +18,8 @@ func MakeRouter() map[string]CmdFunc {
 	routerMap["getset"] = defaultFunc
 
 	routerMap["ping"] = Ping
+	routerMap["rename"] = Rename
+	routerMap["renamenx"] = Rename
 
 	return routerMap
 }

@@ -20,6 +20,7 @@ func MakeRouter() map[string]CmdFunc {
 	routerMap["ping"] = Ping
 	routerMap["rename"] = Rename
 	routerMap["renamenx"] = Rename
+	routerMap["flushdb"] = FlushDB
 
 	return routerMap
 }

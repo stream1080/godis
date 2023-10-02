@@ -21,6 +21,7 @@ func MakeRouter() map[string]CmdFunc {
 	routerMap["rename"] = Rename
 	routerMap["renamenx"] = Rename
 	routerMap["flushdb"] = FlushDB
+	routerMap["del"] = Del
 
 	return routerMap
 }

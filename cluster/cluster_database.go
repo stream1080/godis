@@ -42,6 +42,8 @@ func MakeClusterDatabases() *ClusterDatabases {
 	return cluster
 }
 
+type CmdFunc func(cluster *ClusterDatabases, c resp.Connection, args [][]byte) resp.Reply
+
 func (cluster *ClusterDatabases) Exec(client resp.Connection, args [][]byte) resp.Reply {
 	panic("implement me")
 }

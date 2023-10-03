@@ -2,6 +2,7 @@ package cluster
 
 import (
 	"context"
+
 	pool "github.com/jolestar/go-commons-pool/v2"
 
 	"github.com/stream1080/godis/config"
@@ -44,14 +45,16 @@ func MakeClusterDatabases() *ClusterDatabases {
 
 type CmdFunc func(cluster *ClusterDatabases, c resp.Connection, args [][]byte) resp.Reply
 
+var router = MakeRouter()
+
 func (cluster *ClusterDatabases) Exec(client resp.Connection, args [][]byte) resp.Reply {
 	panic("implement me")
 }
 
 func (cluster *ClusterDatabases) Close() {
-	panic("implement me")
+	cluster.db.Close()
 }
 
 func (cluster *ClusterDatabases) AfterClientClose(conn resp.Connection) {
-	panic("implement me")
+	cluster.db.AfterClientClose(conn)
 }

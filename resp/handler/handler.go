@@ -7,6 +7,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/stream1080/godis/cluster"
+	"github.com/stream1080/godis/config"
 	"github.com/stream1080/godis/database"
 	databaseface "github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/lib/logger"
@@ -25,8 +27,15 @@ type RespHandler struct {
 }
 
 func MakeRespHandler() *RespHandler {
+	var db databaseface.Database
+	if config.Properties.Self != "" && len(config.Properties.Peers) > 0 {
+		db = cluster.MakeClusterDatabases()
+	} else {
+		db = database.NewStandaloneDatabase()
+	}
+
 	return &RespHandler{
-		db: database.NewStandaloneDatabase(),
+		db: db,
 	}
 }
 

@@ -2,14 +2,17 @@ package cluster
 
 import (
 	"context"
-
-	pool "github.com/jolestar/go-commons-pool/v2"
+	"strings"
 
 	"github.com/stream1080/godis/config"
 	database2 "github.com/stream1080/godis/database"
 	"github.com/stream1080/godis/interface/database"
 	"github.com/stream1080/godis/interface/resp"
 	"github.com/stream1080/godis/lib/consistenthash"
+	"github.com/stream1080/godis/lib/logger"
+	"github.com/stream1080/godis/resp/reply"
+
+	pool "github.com/jolestar/go-commons-pool/v2"
 )
 
 type ClusterDatabases struct {
@@ -47,8 +50,21 @@ type CmdFunc func(cluster *ClusterDatabases, c resp.Connection, args [][]byte) r
 
 var router = MakeRouter()
 
-func (cluster *ClusterDatabases) Exec(client resp.Connection, args [][]byte) resp.Reply {
-	panic("implement me")
+func (cluster *ClusterDatabases) Exec(client resp.Connection, args [][]byte) (result resp.Reply) {
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Error(err)
+			result = &reply.UnknownErrReply{}
+		}
+	}()
+
+	cmdName := strings.ToLower(string(args[0]))
+	cmdFunc, ok := router[cmdName]
+	if !ok {
+		return reply.MakeErrReply("not supported cmd")
+	}
+
+	return cmdFunc(cluster, client, args)
 }
 
 func (cluster *ClusterDatabases) Close() {

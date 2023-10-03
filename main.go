@@ -23,7 +23,19 @@ func fileExists(fileName string) bool {
 	return err == nil && !info.IsDir()
 }
 
+var banner = `
+   ______          ___
+  / ____/___  ____/ (_)____
+ / / __/ __ \/ __  / / ___/
+/ /_/ / /_/ / /_/ / (__  )
+\____/\____/\__,_/_/____/
+
+
+`
+
 func main() {
+
+	fmt.Print(banner)
 
 	// 默认配置
 	logger.Setup(&logger.Settings{
